@@ -20,7 +20,8 @@
 
     <h2>Tranparent Dapp Demo</h2>
     <br >
-    <h2 id="info"></h2><br>
+    <div id="latest" style="background: #ffc; border: 1px solid cyan;"></div>
+    <h2 id="info"></h2>
     <button onclick="getTweets();">Get All Tweets</button>
     <button onclick="changeCoolNumber();">Write Lonely Tweet</button><br><br>
     Name: <input id="name"></textbox><br>
@@ -30,6 +31,7 @@
 
     <script type="text/javascript">
      var a = document.getElementById("info");
+     var b = document.getElementById("latest");
 
         async function loadWeb3() {
             if (window.ethereum) {
@@ -51,13 +53,13 @@
         async function getTweets() {
             updateStatus('fetching All Tweets...');
             const tweetsNumber = await window.contract.methods.getTotalTweet().call();
-            
+
             for (i = 0;i < tweetsNumber;i++){
                 var result1 = await window.contract.methods.getTweetDetail(i).call();
                 a.innerHTML = a.innerHTML+"<h5>" + "TweetID: "+result1[0]+" " + "Name: " + result1[1] + " Content: " + result1[2] + "</h5>";
 
             }
-           
+
             updateStatus(`All Tweets No.: ${tweetsNumber}`);
         }
 
@@ -76,13 +78,31 @@
         async function load() {
             await loadWeb3();
             window.contract = await loadContract();
-            updateStatus('Ready!');
+
+            /* When ready, lets call our refresh function
+             * every 10 seconds
+             */
+            if(window.contract) {
+                updateStatus('Ready!');
+                setTimeout(refresh, 10000);
+            }
         }
 
         function updateStatus(status) {
             const statusEl = document.getElementById('status');
             statusEl.innerHTML = status;
             console.log(status);
+        }
+
+        async function refresh(){
+            const tweetsNumber = await window.contract.methods.getTotalTweet().call();
+
+            for (i = tweetsNumber-10;i < tweetsNumber;i++){
+                var result1 = await window.contract.methods.getTweetDetail(i).call();
+                b.innerHTML = b.innerHTML+"<h5>" + "TweetID: "+result1[0]+" " + "Name: " + result1[1] + " Content: " + result1[2] + "</h5>";
+            }
+
+            updateStatus(`Fetched latest ${tweetsNumber-10} tweets`);
         }
 
         load();
