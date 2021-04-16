@@ -20,7 +20,7 @@
 
     <h2>Tranparent Dapp Demo</h2>
     <br >
-    <div id="latest" style="background: #ffc; border: 1px solid cyan;"></div>
+    <div id="latest" style="padding: 0.1em 0.5em; background: #ffc; border: 1px solid cyan;"></div>
     <h2 id="info"></h2>
     <button onclick="getTweets();">Get All Tweets</button>
     <button onclick="changeCoolNumber();">Write Lonely Tweet</button><br><br>
@@ -83,7 +83,9 @@
              * every 10 seconds
              */
             if(window.contract) {
+                latest10();
                 updateStatus('Ready!');
+
                 setTimeout(refresh, 10000);
             }
         }
@@ -94,7 +96,7 @@
             console.log(status);
         }
 
-        async function refresh(){
+        async function latest10(){
             const tweetsNumber = await window.contract.methods.getTotalTweet().call();
 
             for (i = tweetsNumber-10;i < tweetsNumber;i++){
@@ -102,7 +104,11 @@
                 b.innerHTML = b.innerHTML+"<h5>" + "TweetID: "+result1[0]+" " + "Name: " + result1[1] + " Content: " + result1[2] + "</h5>";
             }
 
-            updateStatus(`Fetched latest ${tweetsNumber-10} tweets`);
+            updateStatus(`Fetched latest 10 tweets`);
+        }
+
+        function refresh() {
+            window.location.reload(true);
         }
 
         load();
